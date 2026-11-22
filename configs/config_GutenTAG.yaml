@@ -1,0 +1,87 @@
+
+# ============================================================
+# Ablation study configuration — N=10, M=15
+# ============================================================
+
+environment:
+  n_nodes:   10
+  n_metrics: 15
+  episode_length: 512       
+  per_metric_cost: 0.01
+
+  cost_iot:   0.05
+  cost_edge:  0.02
+  cost_cloud: 0.005
+
+  # Node-tier split. Cloud is derived as the remainder, so the value below is
+  # documentation only — the generator ignores it. N=10 realises this split
+  # exactly (3 IoT / 4 edge / 3 cloud).
+  node_tiers:
+    iot: 0.3
+    edge: 0.4
+    cloud: 0.3
+
+  # Per-tier monitoring capacity, as a fraction of M. Stated explicitly rather
+  # than inherited from a code default, so this file fully describes the topology.
+  iot_cap_range:   [0.20, 0.40]
+  edge_cap_range:  [0.40, 0.70]
+  cloud_cap_range: [0.70, 0.90]
+
+  anomaly_baseline_pct: 80
+  causal_baseline_pct:  100
+
+  window_size: 10
+  window_agg:  max
+  coverage_mode: window
+
+reward:
+  alpha:   10.0
+  beta:    1.0
+  lambda_: 0.1
+  delta:   0.1
+  eta:     2.0
+
+ppo:
+  total_timesteps: 3_000_000  # NM=150 needs ~2x more than NM=35
+                               # ablation: 5 × 3M = 15M total steps
+  n_envs:     4
+  n_steps:    512
+  batch_size: 256             # larger than N=5,M=7 (was 128) — more stable gradients
+  n_epochs:   10
+  gamma:      0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  learning_rate: 1.0e-4
+  ent_coef:   0.02            # low — 150 actions still manageable
+  vf_coef:    0.25
+  max_grad_norm: 0.5
+  eval_freq:     10_000       # eval every 10k steps
+  eval_episodes: 20           # enough for stable eval estimate
+
+policy:
+  # PerMetricActorCritic settings
+  policy_type:    per_metric
+  metric_hidden:  128
+  global_hidden:  256
+  global_pool:    mean     
+  activation:     relu
+  use_layer_norm: true
+
+  # Flat MLP settings (used only if policy_type: flat)
+  # hidden_sizes:   [512, 256]
+  # activation:     relu
+  # use_layer_norm: true
+
+data:
+  n_train_episodes: 500       # more than N=5,M=7 (200) — richer training diversity
+  n_eval_episodes:  100       # more than N=5,M=7 (50) — reliable ablation stats
+  anomaly_density:  0.15      # same as main config
+  causal_density:   0.25
+  seed: 42
+
+paths:
+  data_dir:    data
+  results_dir: results/
+  run_name:    null
+  model_name:  best_model.pt
+  log_name:    training_log.csv

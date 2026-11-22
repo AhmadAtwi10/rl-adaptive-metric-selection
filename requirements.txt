@@ -1,0 +1,21 @@
+# Versions used for the experiments (Python 3.10)
+numpy==1.26.4
+torch==2.5.1
+gymnasium==1.2.3
+pyyaml==6.0.3
+matplotlib==3.10.8
+pandas==2.3.3
+scipy==1.15.3
+
+# Optional: TensorBoard logging (scripts/tensorboard_viz.py)
+# tensorboard==2.20.0
+
+# Causal scores with PCMCI+ (outer_models/causal_discovery/pcmci_pipeline.py).
+# joblib is imported by tigramite but not declared by it.
+tigramite==5.2.10.1
+joblib==1.5.3
+
+# Anomaly scores with LSTM-AD (outer_models/timeeval_model/) need TimeEval, which pins
+# numpy<2 through its dependencies. Install it in a separate environment:
+#   python -m venv timeeval-venv && ./timeeval-venv/bin/pip install timeeval==1.5.0
+# It also needs a running Docker daemon and the image ghcr.io/timeeval/lstm_ad:0.3.0.

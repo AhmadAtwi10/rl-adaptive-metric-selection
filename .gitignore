@@ -1,0 +1,25 @@
+# Virtual environments
+venv/
+.venv/
+*-venv/
+rl_gpu_venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Training / evaluation outputs
+results/
+logs/
+*.log
+
+# Generated episode pools, derived scores and downloaded datasets
+data/*
+!data/*.py
+datasets/
+*.pkl
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

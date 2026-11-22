@@ -1,0 +1,71 @@
+# Settings used for Table I, anomaly density 0.05 (per-metric policy (ours)).
+# Seeds are set per run by scripts/run_multiseed.py.
+data:
+  anomaly_density: 0.05
+  causal_density: 0.25
+  n_eval_episodes: 200
+  n_train_episodes: 500
+  seed: 42
+environment:
+  anomaly_baseline_pct: 80
+  causal_baseline_pct: 100
+  cloud_cap_range:
+  - 0.7
+  - 0.9
+  cost_cloud: 0.005
+  cost_edge: 0.02
+  cost_iot: 0.05
+  coverage_mode: window
+  edge_cap_range:
+  - 0.4
+  - 0.7
+  episode_length: 512
+  iot_cap_range:
+  - 0.2
+  - 0.4
+  n_metrics: 7
+  n_nodes: 5
+  node_tiers:
+    cloud: 0.3
+    edge: 0.4
+    iot: 0.3
+  per_metric_cost: 0.01
+  window_agg: max
+  window_size: 10
+paths:
+  data_dir: data
+  log_name: training_log.csv
+  model_name: best_model.pt
+  results_dir: results/
+  run_name: null
+policy:
+  activation: relu
+  global_hidden: 128
+  global_pool: concat
+  hidden_sizes:
+  - 256
+  - 128
+  metric_hidden: 64
+  policy_type: per_metric
+  use_layer_norm: true
+ppo:
+  batch_size: 128
+  clip_range: 0.2
+  ent_coef: 0.03
+  eval_episodes: 20
+  eval_freq: 5000
+  gae_lambda: 0.95
+  gamma: 0.99
+  learning_rate: 0.0003
+  max_grad_norm: 0.5
+  n_envs: 4
+  n_epochs: 10
+  n_steps: 512
+  total_timesteps: 10000000
+  vf_coef: 0.25
+reward:
+  alpha: 10.0
+  beta: 1.0
+  delta: 0.1
+  eta: 2.0
+  lambda_: 0.1

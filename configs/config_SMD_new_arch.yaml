@@ -1,0 +1,122 @@
+# -------------------------------------------------------------
+environment:
+  n_nodes: 28
+  n_metrics: 38
+  episode_length: 512
+  per_metric_cost: 0.01     
+
+  # Per-tier monitoring costs (per selected metric per timestep)
+  # IoT > Edge > Cloud — reflects resource constraints
+  cost_iot:   0.05          # high — constrained device, battery, bandwidth
+  cost_edge:  0.02          # moderate
+  cost_cloud: 0.005         # low — abundant resources
+
+  # Node-tier split. Cloud is derived as the remainder, so the value below is
+  # documentation only — the generator ignores it. Note that node counts are
+  # floored to integers, so small N may not realise these fractions exactly
+  # (N=5 with 0.3/0.4 yields 1 IoT / 2 edge / 2 cloud = 20/40/40).
+  node_tiers:
+    iot: 0.3
+    edge: 0.4
+    cloud: 0.3
+
+  # Per-tier monitoring capacity, as a fraction of M. Stated explicitly rather
+  # than inherited from a code default, so this file fully describes the topology.
+  iot_cap_range:   [0.20, 0.40]
+  edge_cap_range:  [0.40, 0.70]
+  cloud_cap_range: [0.70, 0.90]
+
+  # Anomaly/causal baselines — stored in episode dict during build_episode_pool
+  # and read by the environment. Must match what you want to use at training time.
+  # pct=80 → only top 20% of scores earn importance reward (sharp signal)
+  # pct=100 → causal scores zeroed out (ablation: anomaly only)
+  anomaly_baseline_pct: 70
+  causal_baseline_pct: 100
+
+  # Window: agent decides once per W timesteps (W=1 = per-timestep)
+  window_size: 10          # W — timesteps per decision window
+  window_agg: max          # how to aggregate scores over window: max or mean
+  coverage_mode: window
+# -------------------------------------------------------------
+# Reward weights
+# -------------------------------------------------------------
+reward:
+  alpha: 10.0
+
+  # FIX BUG 3: beta raised 1.0→3.0 — at beta=1 it was profitable to overflow
+  # capacity; at beta=3 the overflow cost always exceeds importance gain
+  beta: 1.0
+
+  # FIX BUG 1 (partial): lambda reduced 1.0→0.1 so cost term doesn't suppress
+  # selection — the main learning signal should be importance vs capacity
+  lambda_: 0.1
+
+  delta: 0.1
+  eta: 2.0
+
+# -------------------------------------------------------------
+# PPO Hyperparameters
+# -------------------------------------------------------------
+ppo:
+  total_timesteps: 15_000_000
+  n_envs: 8
+  n_steps: 1024
+  batch_size: 512   # increased from 64 for more stable gradient estimates
+
+  n_epochs: 10
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  learning_rate: 1.0e-4
+
+  # FIX BUG 2: raised 0.01→0.02 to maintain exploration pressure longer
+  ent_coef: 0.02
+
+  # FIX BUG 1: lowered 0.5→0.25 so critic's large-scale loss doesn't drown
+  # the policy gradient through the shared encoder
+  vf_coef: 0.25
+
+  max_grad_norm: 0.5
+  eval_freq: 30_000
+  eval_episodes: 20
+
+# -------------------------------------------------------------
+# Policy Network
+# -------------------------------------------------------------
+
+# Flat MLP arch
+# policy:
+
+#   policy_type: flat
+#   hidden_sizes: [2048, 1024, 512]
+#   activation: relu
+#   use_layer_norm: true
+
+# PerMetricActorCritic arch
+policy:
+  policy_type: per_metric
+  metric_hidden: 128
+  global_hidden: 256
+  activation: relu
+  use_layer_norm: true
+
+# -------------------------------------------------------------
+# Data
+# -------------------------------------------------------------
+data:
+  n_train_episodes: 500
+  n_eval_episodes: 100
+  anomaly_density: 0.15
+  causal_density: 0.25
+  seed: 42
+
+# -------------------------------------------------------------
+# Paths
+# -------------------------------------------------------------
+paths:
+  data_dir: data
+  results_dir: results/
+  run_name: null            # set here OR pass --run-name on CLI
+                            # null → auto-generate from timestamp
+  model_name: best_model.pt
+  log_name: training_log.csv
