@@ -42,27 +42,6 @@ The anomaly scores are computed with **LSTM-AD** through [TimeEval](https://gith
 causal scores with **PCMCI+** through [tigramite](https://github.com/jakobrunge/tigramite) (see
 [Anomaly and causal scores](#anomaly-and-causal-scores)).
 
-## Results
-
-Synthetic setting with 5 nodes × 7 metrics, mean ± standard deviation over 5 paired seeds (Table I of the paper):
-
-| Anomaly density | Method | ACR ↑ | FMR ↓ | Total coverage ↑ | Selected ↓ | Cost ↓ |
-|---|---|---|---|---|---|---|
-| 0.05 | Monitor-Everything | 1.000 | 0.883 | 0.209 | 35.0 | 0.700 |
-| | TopK-Anomaly-Causal | 0.915 | 0.794 | 0.336 | 18.1 | 0.255 |
-| | RL-Flat-MLP | 0.907 | 0.741 | 0.403 | 14.2 | 0.230 |
-| | **Ours** | 0.936 | **0.611** | **0.543** | **10.4** | **0.146** |
-| 0.25 | Monitor-Everything | 1.000 | 0.533 | 0.636 | 35.0 | 0.700 |
-| | TopK-Anomaly-Causal | 0.788 | 0.296 | 0.743 | 18.1 | 0.255 |
-| | RL-Flat-MLP | 0.891 | 0.309 | 0.778 | 21.0 | 0.387 |
-| | **Ours** | 0.861 | **0.106** | **0.877** | **15.0** | **0.254** |
-
-ACR is the share of anomalous metrics that are monitored, FMR the share of monitored metrics that are not anomalous,
-and total coverage the harmonic mean of ACR and 1 − FMR. The learned policy monitors far fewer metrics than
-monitoring everything (10 instead of 35 at density 0.05) and gives the best trade-off between coverage and cost.
-The paper also reports results at a larger scale (28 nodes × 38 metrics, the size of the Server Machine Dataset)
-and a study of the reward weights.
-
 ## Setup
 
 ```bash
