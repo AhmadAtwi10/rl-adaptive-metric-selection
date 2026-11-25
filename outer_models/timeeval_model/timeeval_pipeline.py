@@ -1665,11 +1665,11 @@ def main():
         print("\n  [SKIP] Step 5 — RL evaluation skipped")
         print(f"  Score files ready in: "
               f"{algo_dir(work_dir, args.algorithm) / 'anomaly_scores'}/")
-        print(f"  To evaluate later:")
-        print(f"    PYTHONPATH=. python scripts/evaluate_agent.py \\")
-        print(f"        --source smd \\")
-        print(f"        --anomaly-dir {work_dir / 'anomaly_scores'} \\")
-        print(f"        --model {args.model}")
+        print(f"  To evaluate later (with causal scores from pcmci_pipeline.py):")
+        print(f"    python scripts/compute_metrics.py --model {args.model} \\")
+        print(f"        --source derived --raw-dataset-dir {args.dataset_dir} \\")
+        print(f"        --derived-anomaly-dir {algo_dir(work_dir, args.algorithm) / 'anomaly_scores'} \\")
+        print(f"        --derived-causal <causal_scores.npy>")
 
     banner("Pipeline complete")
 
